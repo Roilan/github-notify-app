@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import Button from './Button';
 import Input from './Input';
+import ScreenLoader from './ScreenLoader';
 
 class Login extends Component {
   constructor() {
@@ -7,10 +9,12 @@ class Login extends Component {
 
     this.state = {
       username: '',
-      token: ''
+      token: '',
+      loading: false
     };
 
     this.onChange = this.onChange.bind(this);
+    this.onLogin = this.onLogin.bind(this);
   }
 
   onChange(type, e, value) {
@@ -19,11 +23,18 @@ class Login extends Component {
     });
   }
 
+  onLogin() {
+    this.setState({ loading: true });
+  }
+
   render() {
-    const InputFields = Object.keys(this.state).map(name => (
+    const { loading } = this.state;
+
+    const InputFields = Object.keys(this.state).filter(name => name !== 'loading').map(name => (
       <Input
         key={name}
         label={name}
+        fullWidth={true}
         onChange={this.onChange.bind(null, name)}
         value={this.state[name]}
       />
@@ -32,6 +43,18 @@ class Login extends Component {
     return (
       <div className='login-screen'>
         {InputFields}
+
+        <div className='login-screen-button-container'>
+          <Button
+            label='Login'
+            disabled={loading}
+            primary={true}
+            fullWidth={true}
+            onClick={this.onLogin}
+          />
+        </div>
+
+        <ScreenLoader loading={loading} />
       </div>
     );
   }
