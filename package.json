@@ -11,13 +11,14 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "~1.6.2",
-    "electron-debug": "^1.4.0",
-    "electron-hot-loader": "^0.8.0"
+    "electron-debug": "^1.4.0"
   },
   "dependencies": {
+    "electron-hot-loader": "^0.8.0",
     "material-ui": "^0.18.7",
     "menubar": "^5.2.3",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react-dom": "^15.6.1",
+    "react-tap-event-plugin": "^2.0.1"
   }
 }
