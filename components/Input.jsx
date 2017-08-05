@@ -3,7 +3,7 @@ import TextField from 'material-ui/TextField';
 
 const Input = ({
   id, label, errorText, onChange, value,
-  fullWidth
+  fullWidth, type
 }) => (
   <TextField
     id={id}
@@ -11,6 +11,7 @@ const Input = ({
     fullWidth={fullWidth}
     errorText={errorText}
     onChange={onChange}
+    type={type}
     value={value}
   />
 );

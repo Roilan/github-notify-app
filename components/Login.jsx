@@ -82,6 +82,7 @@ class Login extends Component {
         fullWidth={true}
         errorText={errorStatus[name]}
         onChange={this.onChange.bind(null, name)}
+        type={name === 'token' ? 'password' : 'text'}
         value={credentials[name]}
       />
     ));
