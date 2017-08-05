@@ -3,6 +3,7 @@ if (process.env.NODE_ENV !== 'production') {
 
   electronHot.install();
   electronHot.watchJsx(['components/*.jsx']);
+  electronHot.watchCss(['css/*.css']);
 }
 
 require('./renderer-react');
