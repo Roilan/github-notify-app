@@ -4,7 +4,7 @@
   "description": "Get notifications from Github",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron -r babel-register ."
   },
   "repository": "https://github.com/Roilan/github-notify-app",
   "author": "Roilan",
@@ -13,6 +13,11 @@
     "electron": "~1.6.2"
   },
   "dependencies": {
-    "menubar": "^5.2.3"
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.24.1",
+    "menubar": "^5.2.3",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
   }
 }
