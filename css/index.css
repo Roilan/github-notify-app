@@ -11,9 +11,18 @@ body {
   margin: 0
 }
 
+#app {
+  padding: 30px;
+}
+
 .login-screen {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+.login-screen-button-container {
+  margin-top: 20px;
+  width: 100%;
 }
