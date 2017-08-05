@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import objectAssignDeep from 'object-assign-deep';
+import { username, token } from '../dev.config';
+import { getNotifications } from '../utils/github';
 import Button from './Button';
 import Input from './Input';
 import ScreenLoader from './ScreenLoader';
-import objectAssignDeep from 'object-assign-deep';
 
 class Login extends Component {
   constructor() {
@@ -10,8 +12,8 @@ class Login extends Component {
 
     this.state = {
       credentials: {
-        username: '',
-        token: ''
+        username: username,
+        token: token
       },
       errorStatus: {
         username: '',
@@ -54,7 +56,8 @@ class Login extends Component {
     };
   }
 
-  onLogin() {
+  async onLogin() {
+    const { username, token } = this.state.credentials;
     const validateFields = this.validateCredentialFields();
 
     if (!validateFields.isValid) {
@@ -64,7 +67,9 @@ class Login extends Component {
       return;
     }
 
-    this.setState({ loading: true });
+    let notifications = await getNotifications({ username, token });
+    console.log(notifications);
+    // this.setState({ loading: true });
   }
 
   render() {
