@@ -4,7 +4,7 @@
   "description": "Get notifications from Github",
   "main": "main.js",
   "scripts": {
-    "start": "electron -r babel-register ."
+    "start": "electron ."
   },
   "repository": "https://github.com/Roilan/github-notify-app",
   "author": "Roilan",
@@ -15,6 +15,7 @@
     "electron-hot-loader": "^0.8.0"
   },
   "dependencies": {
+    "material-ui": "^0.18.7",
     "menubar": "^5.2.3",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
