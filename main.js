@@ -1,6 +1,14 @@
-const menubar = require('menubar')
+const menubar = require('menubar');
 
-const mb = menubar()
+let menubarOpts = {};
+
+if (process.env.NODE_ENV !== 'production') {
+  require('electron-debug');
+
+  menubarOpts.alwaysOnTop = true;
+}
+
+const mb = menubar(menubarOpts);
 
 mb.on('ready', function ready () {
   console.log('app is ready')
