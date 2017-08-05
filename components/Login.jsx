@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router';
 import objectAssignDeep from 'object-assign-deep';
 import { username, token } from '../dev.config';
 import { getNotifications } from '../utils/github';
@@ -67,13 +68,25 @@ class Login extends Component {
       return;
     }
 
-    let notifications = await getNotifications({ username, token });
-    console.log(notifications);
-    // this.setState({ loading: true });
+    this.setState({ loading: true });
+
+    try {
+      const notifications = (await getNotifications({ username, token })).data;
+
+      this.props.setNotifications({ notifications });
+    } catch (error) {
+      // TODO: display some error UI
+      console.log('ERROR LOGGING IN', error);
+    }
   }
 
   render() {
     const { credentials, errorStatus, loading } = this.state;
+    const { loggedIn, match } = this.props;
+
+    if (loggedIn && match.url === '/') {
+      return <Redirect to='/settings' />
+    }
 
     const InputFields = Object.keys(this.state.credentials).map(name => (
       <Input
