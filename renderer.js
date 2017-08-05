@@ -1,7 +1,8 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './components/App.jsx';
+if (process.env.NODE_ENV !== 'production') {
+  const electronHot = require('electron-hot-loader');
 
-window.onload = () => {
-  ReactDOM.render(<App />, document.getElementById('app'));
+  electronHot.install();
+  electronHot.watchJsx(['components/*.jsx']);
 }
+
+require('./renderer-react');

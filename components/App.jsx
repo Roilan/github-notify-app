@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
+const React = require('react');
 
-class App extends Component {
+class App extends React.Component {
   render() {
     return (
       <div>
+        <h1>tester</h1>
         Hello React
       </div>
     );
   }
 }
 
-export default App;
+module.exports = App;
