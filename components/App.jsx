@@ -18,14 +18,24 @@ class App extends Component {
 
     this.state = {
       loggedIn: false,
-      notifications: []
+      notifications: [],
+      currentPath: '/'
     };
 
+    this.historyListener;
     this.setLogin = this.setLogin.bind(this);
     this.setNotifications = this.setNotifications.bind(this);
   }
 
   async componentDidMount() {
+    this.historyListener = history.listen((location) => {
+      const { currentPath } = this.state;
+
+      if (currentPath !== location.pathname) {
+        this.setState({ currentPath: location.pathname });
+      }
+    });
+
     try {
       const credentials = await storage.get('credentials');
       const hasCredentials = credentials.username && credentials.token;
@@ -38,6 +48,10 @@ class App extends Component {
       // TODO: handle this
       console.log('Error signing in with stored credentials or finding data');
     }
+  }
+
+  componentWillUnmount() {
+    this.historyListener();
   }
 
   async setNotifications({ notifications }) {
