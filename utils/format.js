@@ -22,6 +22,6 @@ export const formatNotificationData = ({ notifications, userSettings }) => {
   return notifications.filter((notification) => {
     const isValidReason = usersAcceptedReasons.find(reason => reason === notification.reason);
 
-    return isValidReason;
+    return notification.unread && isValidReason;
   });
 };
