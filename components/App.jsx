@@ -5,11 +5,15 @@ import injectTapEvent from 'react-tap-event-plugin';
 import ThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import CircularProgress from 'material-ui/CircularProgress';
 import objectAssignDeep from 'object-assign-deep';
+import toMs from 'to-ms';
+import arrayDiff from 'simple-array-diff';
 import Login from './Login';
 import Settings from './Settings';
 import storage from '../utils/storage';
 import { getNotifications } from '../utils/github';
 import { formatNotificationData } from '../utils/format';
+import userReasons from '../utils/user-reasons';
+import sendNotification from '../utils/notification';
 
 injectTapEvent();
 
@@ -24,6 +28,7 @@ class App extends Component {
       loading: true,
       loggedIn: false,
       notifications: [],
+      notificationsBatch: [],
       userSettings: {
         notifications: {
           reasons: {
@@ -64,7 +69,8 @@ class App extends Component {
               checked: false
             }
           },
-          frequency: undefined // needs to default to undefined
+          frequency: 10,
+          displayFrequency: 1
         }
       },
       settings: {
@@ -76,6 +82,8 @@ class App extends Component {
     };
 
     this.historyListener;
+    this.notificationTimer;
+    this.clearNotificationTimer = this.clearNotificationTimer.bind(this);
     this.setNotifications = this.setNotifications.bind(this);
     this.onNotificationSubscriptionClick = this.onNotificationSubscriptionClick.bind(this);
     this.onSaveSettingsClick = this.onSaveSettingsClick.bind(this);
@@ -99,7 +107,7 @@ class App extends Component {
       const { data } = hasCredentials ? await getNotifications(credentials) : {};
 
       if (userSettings && Object.keys(userSettings).length) {
-        this.setState({ userSettings });
+        this.setState(prevState => objectAssignDeep({}, prevState, { userSettings }));
       }
 
       if (data) {
@@ -110,11 +118,56 @@ class App extends Component {
       console.log('Error signing in with stored credentials or finding data');
     }
 
+    this.setNotificationTimer();
     this.setState({ loading: false });
   }
 
   componentWillUnmount() {
     this.historyListener();
+    this.clearNotificationTimer();
+  }
+
+  clearNotificationTimer() {
+    if (this.notificationTimer) {
+      clearInterval(this.notificationTimer);
+    }
+  }
+
+  setNotificationTimer() {
+    const { loggedIn, userSettings, notifications } = this.state;
+    const { reasons, frequency, displayFrequency } = userSettings.notifications;
+
+    if (loggedIn && userReasons(reasons).length && frequency & displayFrequency && frequency > displayFrequency) {
+      console.log('SET TIMER')
+      this.notificationTimer = setInterval(async () => {
+        // TODO: Refactor `Login` and move credentials into this App component
+        // Fetching from local FS is expensive and dirty
+        try {
+          const credentials = await storage.get('credentials');
+          const hasCredentials = credentials.username && credentials.token;
+          const { data } = hasCredentials ? await getNotifications(credentials) : {};
+
+          if (!data) {
+            throw new Error('Unable to get notifications');
+          }
+
+          const formattedNewNotifications = formatNotificationData({ notifications: data, userSettings });
+          const newNotifications = arrayDiff(notifications, formattedNewNotifications, 'id').common;
+          // TODO: should be `added`, only `common` for testing
+
+          if (newNotifications) {
+            this.setState(prevState => ({
+              notifications: prevState.notifications.concat(newNotifications),
+              notificationsBatch: prevState.notificationsBatch.concat(newNotifications)
+            }));
+          }
+        } catch (error) {
+          // TODO: handle error better
+          sendNotification({ title: 'Notification Timer Error', body: error });
+          this.clearNotificationTimer();
+        }
+      }, toMs.minutes(frequency))
+    }
   }
 
   async setNotifications({ notifications }) {
@@ -138,14 +191,14 @@ class App extends Component {
     }));
   }
 
-  onFrequencyChange(e, value) {
+  onFrequencyChange(type, e, value) {
     const isValidValue = !isNaN(value);
 
     if (isValidValue) {
       this.setState(prevState => objectAssignDeep({}, prevState, {
         userSettings: {
           notifications: {
-            frequency: value
+            [type]: value
           }
         }
       }));
@@ -164,8 +217,27 @@ class App extends Component {
   }
 
   async onSaveSettingsClick() {
+    const { userSettings } = this.state;
+    const { notifications } = userSettings;
+
+    if (notifications.frequency === 0 || notifications.displayFrequency === 0) {
+      this.toggleSettingsSnackbar({
+        message: 'Error: Frequency cannot be 0',
+        open: true
+      })
+      return;
+    }
+
+    if (notifications.frequency <= notifications.displayFrequency) {
+      this.toggleSettingsSnackbar({
+        message: 'Error: Fetch must be higher than display',
+        open: true
+      })
+      return;
+    }
+
     try {
-      await storage.set('userSettings', this.state.userSettings);
+      await storage.set('userSettings', userSettings);
       this.toggleSettingsSnackbar({
         message: 'Settings saved successfully!',
         open: true
@@ -174,7 +246,7 @@ class App extends Component {
       // TODO: handle this better, eg: UI prompt
       console.log('Saving settings error', error)
       this.toggleSettingsSnackbar({
-        message: 'Error saving settings',
+        message: 'Error: Unable to save settings',
         open: true
       });
     }
@@ -182,6 +254,8 @@ class App extends Component {
 
   render() {
     const { loading, loggedIn, userSettings } = this.state;
+
+    console.log('STATE', this.state);
 
     if (loading) {
       return (
