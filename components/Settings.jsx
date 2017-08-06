@@ -42,6 +42,7 @@ const Settings = ({
       </Paper>
 
       <Button
+        disabled={snackbar.open}
         fullWidth={true}
         primary={true}
         label='Save'
