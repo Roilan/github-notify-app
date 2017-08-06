@@ -5,6 +5,8 @@ import injectTapEvent from 'react-tap-event-plugin';
 import ThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Login from './Login';
 import Settings from './Settings';
+import storage from '../utils/storage';
+import { getNotifications } from '../utils/github';
 
 injectTapEvent();
 
@@ -23,7 +25,22 @@ class App extends Component {
     this.setNotifications = this.setNotifications.bind(this);
   }
 
-  setNotifications({ notifications }) {
+  async componentDidMount() {
+    try {
+      const credentials = await storage.get('credentials');
+      const hasCredentials = credentials.username && credentials.token;
+      const { data } = hasCredentials ? await getNotifications(credentials) : {};
+
+      if (data) {
+        this.setNotifications({ notifications: data });
+      }
+    } catch (error) {
+      // TODO: handle this
+      console.log('Error signing in with stored credentials or finding data');
+    }
+  }
+
+  async setNotifications({ notifications }) {
     this.setState({ notifications, loggedIn: true });
   }
 
