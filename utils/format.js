@@ -13,3 +13,14 @@ export const formatNotificationReasons = (text) => {
 
   return formattedText;
 }
+
+export const formatNotificationData = ({ notifications, userSettings }) => {
+  const { reasons } = userSettings.notifications;
+  const usersAcceptedReasons = Object.keys(reasons).filter(reason => reasons[reason].checked);
+
+  return notifications.filter((notification) => {
+    const isValidReason = usersAcceptedReasons.find(reason => reason === notification.reason);
+
+    return isValidReason;
+  });
+};

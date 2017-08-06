@@ -4,11 +4,12 @@ import { Router, Route, Redirect, Switch } from 'react-router';
 import injectTapEvent from 'react-tap-event-plugin';
 import ThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import CircularProgress from 'material-ui/CircularProgress';
+import objectAssignDeep from 'object-assign-deep';
 import Login from './Login';
 import Settings from './Settings';
 import storage from '../utils/storage';
 import { getNotifications } from '../utils/github';
-import objectAssignDeep from 'object-assign-deep';
+import { formatNotificationData } from '../utils/format';
 
 injectTapEvent();
 
@@ -117,7 +118,12 @@ class App extends Component {
   }
 
   async setNotifications({ notifications }) {
-    this.setState({ notifications, loggedIn: true });
+    const { userSettings } = this.state;
+
+    this.setState({
+      notifications: formatNotificationData({ notifications, userSettings }),
+      loggedIn: true
+    });
   }
 
   onNotificationSubscriptionClick({ name, checked }) {
