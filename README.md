@@ -5,7 +5,7 @@
 - You might miss notifications for repos that do matter to you.
 
 ### Developing
- - Create a local `dev.config.js` with your Github username / personal token (see dev.config.template.js and below for reference)
+ - (optional) Create a local `dev.config.js` with your Github username / personal token (see dev.config.template.js and below for reference)
  - npm start (you'll see a cat icon in your menubar)
 ### Developing tips
 - `cmd + r` refreshes the window / app

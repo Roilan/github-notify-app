@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router';
 import objectAssignDeep from 'object-assign-deep';
-import { username, token } from '../dev.config';
 import { getNotifications } from '../utils/github';
 import Button from './Button';
 import Input from './Input';
 import ScreenLoader from './ScreenLoader';
 import storage from '../utils/storage';
+
+const optionalRequire = require('optional-require')(require);
+const devConfig = optionalRequire('../dev.config') || {};
 
 class Login extends Component {
   constructor() {
@@ -14,8 +16,8 @@ class Login extends Component {
 
     this.state = {
       credentials: {
-        username: username,
-        token: token
+        username: devConfig.username || '',
+        token: devConfig.token || ''
       },
       errorStatus: {
         username: '',
