@@ -3,6 +3,7 @@ import { createHashHistory } from 'history';
 import { Router, Route, Redirect, Switch } from 'react-router';
 import injectTapEvent from 'react-tap-event-plugin';
 import ThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import CircularProgress from 'material-ui/CircularProgress';
 import Login from './Login';
 import Settings from './Settings';
 import storage from '../utils/storage';
@@ -19,6 +20,7 @@ class App extends Component {
 
     this.state = {
       currentPath: '/',
+      loading: true,
       loggedIn: false,
       notifications: [],
       settings: {
@@ -92,6 +94,8 @@ class App extends Component {
       // TODO: handle this
       console.log('Error signing in with stored credentials or finding data');
     }
+
+    this.setState({ loading: false });
   }
 
   componentWillUnmount() {
@@ -115,7 +119,19 @@ class App extends Component {
   }
 
   render() {
-    const { loggedIn, settings } = this.state;
+    const { loading, loggedIn, settings } = this.state;
+
+    if (loading) {
+      return (
+        <ThemeProvider>
+          <CircularProgress
+            color='white'
+            size={80}
+            thickness={5}
+          />
+        </ThemeProvider>
+      );
+    }
 
     const renderView = (Component, props = {}) => routeProps => (
       <Component {...props} {...routeProps} />
