@@ -302,6 +302,8 @@ class App extends Component {
   render() {
     const { loading, loggedIn, userSettings, settings } = this.state;
 
+    console.log('STATE', this.state);
+
     if (loading) {
       return (
         <ThemeProvider>
