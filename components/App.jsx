@@ -13,7 +13,7 @@ import storage from '../utils/storage';
 import { getNotifications } from '../utils/github';
 import { formatNotificationData } from '../utils/format';
 import userReasons from '../utils/user-reasons';
-import sendNotification from '../utils/notification';
+import sendNotification, { doNotDisturbedDisabled } from '../utils/notification';
 
 injectTapEvent();
 
@@ -82,7 +82,8 @@ class App extends Component {
     };
 
     this.notificationTimer;
-    this.clearNotificationTimer = this.clearNotificationTimer.bind(this);
+    this.notificationBatchTimer;
+    this.clearNotificationAndBatchTimer = this.clearNotificationAndBatchTimer.bind(this);
     this.setNotifications = this.setNotifications.bind(this);
     this.onNotificationSubscriptionClick = this.onNotificationSubscriptionClick.bind(this);
     this.onSaveSettingsClick = this.onSaveSettingsClick.bind(this);
@@ -109,25 +110,45 @@ class App extends Component {
       console.log('Error signing in with stored credentials or finding data');
     }
 
-    this.setNotificationTimer();
+    this.setNotificationAndBatchTimer();
     this.setState({ loading: false });
   }
 
   componentWillUnmount() {
-    this.clearNotificationTimer();
+    this.clearNotificationAndBatchTimer();
   }
 
-  clearNotificationTimer() {
+  clearNotificationAndBatchTimer() {
     if (this.notificationTimer) {
       clearInterval(this.notificationTimer);
     }
+
+    if (this.notificationBatchTimer) {
+      clearInterval(this.notificationBatchTimer);
+    }
   }
 
-  setNotificationTimer() {
+  setNotificationAndBatchTimer() {
     const { loggedIn, userSettings, notifications } = this.state;
     const { reasons, frequency, displayFrequency } = userSettings.notifications;
 
-    if (loggedIn && userReasons(reasons).length && frequency & displayFrequency && frequency > displayFrequency) {
+    if (loggedIn && userReasons(reasons).length && frequency && displayFrequency && frequency > displayFrequency) {
+      this.notificationBatchTimer = setInterval(() => {
+        const { notificationsBatch } = this.state;
+        const firstNotification = notificationsBatch[0];
+
+        if (doNotDisturbedDisabled() && firstNotification) {
+          sendNotification({
+            title: `${firstNotification.repository.full_name} (${firstNotification.reason})`,
+            body: firstNotification.subject.title
+          });
+
+          this.setState(prevState => ({
+            notificationsBatch: prevState.notificationsBatch.filter(notification => notification.id !== firstNotification.id)
+          }));
+        }
+      }, toMs.minutes(displayFrequency));
+
       this.notificationTimer = setInterval(async () => {
         // TODO: Refactor `Login` and move credentials into this App component
         // Fetching from local FS is expensive and dirty
@@ -153,7 +174,7 @@ class App extends Component {
         } catch (error) {
           // TODO: handle error better
           sendNotification({ title: 'Notification Timer Error', body: error });
-          this.clearNotificationTimer();
+          this.clearNotificationAndBatchTimer();
         }
       }, toMs.minutes(frequency))
     }
@@ -243,8 +264,6 @@ class App extends Component {
 
   render() {
     const { loading, loggedIn, userSettings } = this.state;
-
-    console.log('STATE', this.state);
 
     if (loading) {
       return (
