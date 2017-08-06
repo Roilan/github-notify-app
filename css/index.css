@@ -45,6 +45,11 @@ body {
   width: 100%;
 }
 
+.settings-screen {
+  display: flex;
+  flex-direction: column;
+}
+
 .setting-screen-subtitle {
   font-size: 14px;
 }
