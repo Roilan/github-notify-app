@@ -273,6 +273,8 @@ class App extends Component {
         message: 'Settings saved successfully!',
         open: true
       });
+      this.clearNotificationAndBatchTimer();
+      this.setNotificationAndBatchTimer();
     } catch (error) {
       // TODO: handle this better, eg: UI prompt
       console.log('Saving settings error', error)
