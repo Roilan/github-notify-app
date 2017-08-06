@@ -28,7 +28,7 @@ const Settings = ({
 
   return (
     <div className='screen settings-screen'>
-      <Paper style={{ maxHeight: 200, overflow: 'auto', boxShadow: 'none', borderBottom: '1px solid rgb(224, 224, 224)' }}>
+      <Paper style={{ maxHeight: 260, overflow: 'auto', boxShadow: 'none', borderBottom: '1px solid rgb(224, 224, 224)' }}>
         <List>
           <Subheader>Notification Subscriptions</Subheader>
           {Object.keys(reasons).map(reason => (
