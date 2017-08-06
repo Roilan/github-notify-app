@@ -13,7 +13,7 @@ const Settings = ({
   loggedIn, match, userSettings, onNotificationSubscriptionClick,
   snackbar, onSaveSettings, onFrequencyChange
 }) => {
-  const { reasons, frequency } = userSettings.notifications;
+  const { reasons, frequency, displayFrequency } = userSettings.notifications;
 
   if (!loggedIn && match.url === '/settings') {
     return <Redirect to='/' />;
@@ -42,10 +42,17 @@ const Settings = ({
       </Paper>
 
       <Input
-        label='Notification Frequency (minutes)'
+        label='Notification Fetch Frequency (minutes)'
         fullWidth={true}
-        onChange={onFrequencyChange}
+        onChange={onFrequencyChange.bind(null, 'frequency')}
         value={frequency}
+      />
+
+      <Input
+        label='Notification Display Frequency (minutes)'
+        fullWidth={true}
+        onChange={onFrequencyChange.bind(null, 'displayFrequency')}
+        value={displayFrequency}
       />
 
       <Button
