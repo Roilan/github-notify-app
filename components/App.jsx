@@ -138,7 +138,6 @@ class App extends Component {
     const { reasons, frequency, displayFrequency } = userSettings.notifications;
 
     if (loggedIn && userReasons(reasons).length && frequency & displayFrequency && frequency > displayFrequency) {
-      console.log('SET TIMER')
       this.notificationTimer = setInterval(async () => {
         // TODO: Refactor `Login` and move credentials into this App component
         // Fetching from local FS is expensive and dirty
