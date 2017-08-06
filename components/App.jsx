@@ -66,7 +66,6 @@ class App extends Component {
           frequency: 1 // minutes
         }
       },
-      saving: false,
       settings: {
         snackbar: {
           open: false,
