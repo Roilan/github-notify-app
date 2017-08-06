@@ -107,7 +107,7 @@ class Login extends Component {
     ));
 
     return (
-      <div className='login-screen'>
+      <div className='screen login-screen'>
         {InputFields}
 
         <div className='login-screen-button-container'>
