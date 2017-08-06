@@ -1,6 +1,8 @@
 const menubar = require('menubar');
 
-let menubarOpts = {};
+const menubarOpts = {
+  height: 600
+};
 
 if (process.env.NODE_ENV !== 'production') {
   require('electron-debug');
