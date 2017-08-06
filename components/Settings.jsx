@@ -1,19 +1,19 @@
 import React from 'react';
 import { Redirect } from 'react-router';
 import Paper from 'material-ui/Paper';
-import {List, ListItem} from 'material-ui/List';
+import { List, ListItem } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Checkbox from 'material-ui/Checkbox';
 import Snackbar from 'material-ui/Snackbar';
 import Button from './Button';
+import Input from './Input';
 import { formatNotificationReasons } from '../utils/format';
 
 const Settings = ({
   loggedIn, match, userSettings, onNotificationSubscriptionClick,
-  snackbar, onSaveSettings
+  snackbar, onSaveSettings, onFrequencyChange
 }) => {
-  const { reasons } = userSettings.notifications;
-  console.log('snackbar', snackbar)
+  const { reasons, frequency } = userSettings.notifications;
 
   if (!loggedIn && match.url === '/settings') {
     return <Redirect to='/' />;
@@ -40,6 +40,13 @@ const Settings = ({
           ))}
         </List>
       </Paper>
+
+      <Input
+        label='Notification Frequency (minutes)'
+        fullWidth={true}
+        onChange={onFrequencyChange}
+        value={frequency}
+      />
 
       <Button
         disabled={snackbar.open}

@@ -63,7 +63,7 @@ class App extends Component {
               checked: false
             }
           },
-          frequency: 1 // minutes
+          frequency: undefined // needs to default to undefined
         }
       },
       settings: {
@@ -78,6 +78,7 @@ class App extends Component {
     this.setNotifications = this.setNotifications.bind(this);
     this.onNotificationSubscriptionClick = this.onNotificationSubscriptionClick.bind(this);
     this.onSaveSettingsClick = this.onSaveSettingsClick.bind(this);
+    this.onFrequencyChange = this.onFrequencyChange.bind(this);
     this.toggleSettingsSnackbar = this.toggleSettingsSnackbar.bind(this);
   }
 
@@ -129,6 +130,20 @@ class App extends Component {
         }
       }
     }));
+  }
+
+  onFrequencyChange(e, value) {
+    const isValidValue = !isNaN(value);
+
+    if (isValidValue) {
+      this.setState(prevState => objectAssignDeep({}, prevState, {
+        userSettings: {
+          notifications: {
+            frequency: value
+          }
+        }
+      }));
+    }
   }
 
   toggleSettingsSnackbar({ message, open }) {
@@ -190,7 +205,8 @@ class App extends Component {
       onSaveSettings: this.onSaveSettingsClick,
       snackbar: Object.assign({}, this.state.settings.snackbar, {
         close: this.toggleSettingsSnackbar.bind(null, { message: '', open: false })
-      })
+      }),
+      onFrequencyChange: this.onFrequencyChange
     });
 
     return (
