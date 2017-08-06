@@ -4,14 +4,16 @@
   "description": "Get notifications from Github",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "rebuild": "electron-rebuild"
   },
   "repository": "https://github.com/Roilan/github-notify-app",
   "author": "Roilan",
   "license": "MIT",
   "devDependencies": {
     "electron": "~1.6.2",
-    "electron-debug": "^1.4.0"
+    "electron-debug": "^1.4.0",
+    "electron-rebuild": "^1.6.0"
   },
   "dependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
@@ -20,6 +22,7 @@
     "babel-register": "^6.24.1",
     "github-api": "^3.0.0",
     "history": "^4.6.3",
+    "macos-notification-state": "^1.1.0",
     "material-ui": "^0.18.7",
     "menubar": "^5.2.3",
     "object-assign-deep": "^0.3.1",
