@@ -69,7 +69,7 @@ const Settings = ({
         disabled={snackbar.open}
         fullWidth={true}
         primary={true}
-        label='Save'
+        label='Save Settings'
         style={{ marginBottom: 16 }}
         onClick={onSaveClick}
       />
