@@ -6,6 +6,7 @@ import { getNotifications } from '../utils/github';
 import Button from './Button';
 import Input from './Input';
 import ScreenLoader from './ScreenLoader';
+import storage from '../utils/storage';
 
 class Login extends Component {
   constructor() {
@@ -71,9 +72,14 @@ class Login extends Component {
     this.setState({ loading: true });
 
     try {
-      const notifications = (await getNotifications({ username, token })).data;
+      const { data, error } = await getNotifications({ username, token });
 
-      this.props.setNotifications({ notifications });
+      if (error) {
+        throw new Error(error);
+      }
+
+      await storage.set('credentials', { username, token });
+      this.props.setNotifications({ notifications: data });
     } catch (error) {
       // TODO: display some error UI
       console.log('ERROR LOGGING IN', error);
