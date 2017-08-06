@@ -23,7 +23,7 @@ class App extends Component {
       loading: true,
       loggedIn: false,
       notifications: [],
-      settings: {
+      userSettings: {
         notifications: {
           reasons: {
             assign: {
@@ -65,12 +65,21 @@ class App extends Component {
           },
           frequency: 1 // minutes
         }
-      }
+      },
+      saving: false,
+      settings: {
+        snackbar: {
+          open: false,
+          message: ''
+        }
+      },
     };
 
     this.historyListener;
     this.setNotifications = this.setNotifications.bind(this);
     this.onNotificationSubscriptionClick = this.onNotificationSubscriptionClick.bind(this);
+    this.onSaveSettingsClick = this.onSaveSettingsClick.bind(this);
+    this.toggleSettingsSnackbar = this.toggleSettingsSnackbar.bind(this);
   }
 
   async componentDidMount() {
@@ -84,8 +93,13 @@ class App extends Component {
 
     try {
       const credentials = await storage.get('credentials');
+      const userSettings = await storage.get('userSettings');
       const hasCredentials = credentials.username && credentials.token;
       const { data } = hasCredentials ? await getNotifications(credentials) : {};
+
+      if (userSettings && Object.keys(userSettings).length) {
+        this.setState({ userSettings });
+      }
 
       if (data) {
         this.setNotifications({ notifications: data });
@@ -108,7 +122,7 @@ class App extends Component {
 
   onNotificationSubscriptionClick({ name, checked }) {
     this.setState(prevState => objectAssignDeep({}, prevState, {
-      settings: {
+      userSettings: {
         notifications: {
           reasons: {
             [name]: { checked: !checked }
@@ -118,8 +132,36 @@ class App extends Component {
     }));
   }
 
+  toggleSettingsSnackbar({ message, open }) {
+    this.setState(prevState => objectAssignDeep({}, prevState, {
+      settings: {
+        snackbar: {
+          open,
+          message
+        }
+      }
+    }));
+  }
+
+  async onSaveSettingsClick() {
+    try {
+      await storage.set('userSettings', this.state.userSettings);
+      this.toggleSettingsSnackbar({
+        message: 'Settings saved successfully!',
+        open: true
+      });
+    } catch (error) {
+      // TODO: handle this better, eg: UI prompt
+      console.log('Saving settings error', error)
+      this.toggleSettingsSnackbar({
+        message: 'Error saving settings',
+        open: true
+      });
+    }
+  }
+
   render() {
-    const { loading, loggedIn, settings } = this.state;
+    const { loading, loggedIn, userSettings } = this.state;
 
     if (loading) {
       return (
@@ -144,8 +186,12 @@ class App extends Component {
     });
 
     const settingProps = Object.assign({}, commonProps, {
-      settings,
-      onNotificationSubscriptionClick: this.onNotificationSubscriptionClick
+      userSettings,
+      onNotificationSubscriptionClick: this.onNotificationSubscriptionClick,
+      onSaveSettings: this.onSaveSettingsClick,
+      snackbar: Object.assign({}, this.state.settings.snackbar, {
+        close: this.toggleSettingsSnackbar.bind(null, { message: '', open: false })
+      })
     });
 
     return (
