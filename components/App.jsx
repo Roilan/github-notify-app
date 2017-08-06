@@ -82,6 +82,7 @@ class App extends Component {
       },
     };
 
+    this.historyListener;
     this.notificationTimer;
     this.notificationBatchTimer;
     this.clearNotificationAndBatchTimer = this.clearNotificationAndBatchTimer.bind(this);
@@ -94,6 +95,10 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    this.historyListener = history.listen((location) => {
+      this.setState({ currentPath: location.pathname });
+    });
+
     try {
       const credentials = await storage.get('credentials');
       const userSettings = await storage.get('userSettings');
@@ -117,6 +122,10 @@ class App extends Component {
   }
 
   componentWillUnmount() {
+    if (this.historyListener) {
+      this.historyListener();
+    }
+
     this.clearNotificationAndBatchTimer();
   }
 
@@ -134,7 +143,7 @@ class App extends Component {
   }
 
   setNotificationAndBatchTimer() {
-    const { loggedIn, userSettings, notifications } = this.state;
+    const { currentPath, loggedIn, userSettings, notifications } = this.state;
     const { reasons, frequency, displayFrequency } = userSettings.notifications;
 
     if (loggedIn && userReasons(reasons).length && frequency && displayFrequency && frequency > displayFrequency) {
@@ -188,6 +197,11 @@ class App extends Component {
           timersRunning: true
         }
       }));
+    } else if (currentPath === '/settings') {
+      this.toggleSettingsSnackbar({
+        message: 'Error: Missing required settings',
+        open: true
+      });
     }
   }
 
