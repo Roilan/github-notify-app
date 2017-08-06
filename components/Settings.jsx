@@ -11,7 +11,8 @@ import { formatNotificationReasons } from '../utils/format';
 
 const Settings = ({
   loggedIn, match, userSettings, onNotificationSubscriptionClick,
-  snackbar, onSaveSettings, onFrequencyChange
+  snackbar, onSaveClick, onFrequencyChange, onNotificationsClick,
+  timersRunning
 }) => {
   const { reasons, frequency, displayFrequency } = userSettings.notifications;
 
@@ -59,9 +60,18 @@ const Settings = ({
         disabled={snackbar.open}
         fullWidth={true}
         primary={true}
+        label={`${timersRunning ? 'Stop / Clear' : 'Start' } Notification Timers`}
+        style={{ marginTop: 'auto', marginBottom: 8 }}
+        onClick={onNotificationsClick}
+      />
+
+      <Button
+        disabled={snackbar.open}
+        fullWidth={true}
+        primary={true}
         label='Save'
-        style={{ marginTop: 'auto', marginBottom: 24 }}
-        onClick={onSaveSettings}
+        style={{ marginBottom: 16 }}
+        onClick={onSaveClick}
       />
 
       <Snackbar

@@ -74,6 +74,7 @@ class App extends Component {
         }
       },
       settings: {
+        timersRunning: false,
         snackbar: {
           open: false,
           message: ''
@@ -87,6 +88,7 @@ class App extends Component {
     this.setNotifications = this.setNotifications.bind(this);
     this.onNotificationSubscriptionClick = this.onNotificationSubscriptionClick.bind(this);
     this.onSaveSettingsClick = this.onSaveSettingsClick.bind(this);
+    this.onSettingsNotificationTimerToggleClick = this.onSettingsNotificationTimerToggleClick.bind(this);
     this.onFrequencyChange = this.onFrequencyChange.bind(this);
     this.toggleSettingsSnackbar = this.toggleSettingsSnackbar.bind(this);
   }
@@ -119,12 +121,15 @@ class App extends Component {
   }
 
   clearNotificationAndBatchTimer() {
-    if (this.notificationTimer) {
+    if (this.notificationTimer && this.notificationTimer) {
       clearInterval(this.notificationTimer);
-    }
-
-    if (this.notificationBatchTimer) {
       clearInterval(this.notificationBatchTimer);
+
+      this.setState(prevState => objectAssignDeep({}, prevState, {
+        settings: {
+          timersRunning: false
+        }
+      }));
     }
   }
 
@@ -177,6 +182,12 @@ class App extends Component {
           this.clearNotificationAndBatchTimer();
         }
       }, toMs.minutes(frequency))
+
+      this.setState(prevState => objectAssignDeep({}, prevState, {
+        settings: {
+          timersRunning: true
+        }
+      }));
     }
   }
 
@@ -187,6 +198,16 @@ class App extends Component {
       notifications: formatNotificationData({ notifications, userSettings }),
       loggedIn: true
     });
+  }
+
+  onSettingsNotificationTimerToggleClick() {
+    const { timersRunning } = this.state.settings;
+
+    if (timersRunning) {
+      this.clearNotificationAndBatchTimer();
+    } else {
+      this.setNotificationAndBatchTimer()
+    }
   }
 
   onNotificationSubscriptionClick({ name, checked }) {
@@ -263,7 +284,7 @@ class App extends Component {
   }
 
   render() {
-    const { loading, loggedIn, userSettings } = this.state;
+    const { loading, loggedIn, userSettings, settings } = this.state;
 
     if (loading) {
       return (
@@ -290,11 +311,13 @@ class App extends Component {
     const settingProps = Object.assign({}, commonProps, {
       userSettings,
       onNotificationSubscriptionClick: this.onNotificationSubscriptionClick,
-      onSaveSettings: this.onSaveSettingsClick,
+      onSaveClick: this.onSaveSettingsClick,
+      onNotificationsClick: this.onSettingsNotificationTimerToggleClick,
       snackbar: Object.assign({}, this.state.settings.snackbar, {
         close: this.toggleSettingsSnackbar.bind(null, { message: '', open: false })
       }),
-      onFrequencyChange: this.onFrequencyChange
+      onFrequencyChange: this.onFrequencyChange,
+      timersRunning: settings.timersRunning
     });
 
     return (
