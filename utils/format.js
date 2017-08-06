@@ -1,4 +1,5 @@
 import capitalize from 'capitalize';
+import userReasons from '../utils/user-reasons';
 
 export const formatNotificationReasons = (text) => {
   const split = text.split('_');
@@ -16,7 +17,7 @@ export const formatNotificationReasons = (text) => {
 
 export const formatNotificationData = ({ notifications, userSettings }) => {
   const { reasons } = userSettings.notifications;
-  const usersAcceptedReasons = Object.keys(reasons).filter(reason => reasons[reason].checked);
+  const usersAcceptedReasons = userReasons(reasons).array;
 
   return notifications.filter((notification) => {
     const isValidReason = usersAcceptedReasons.find(reason => reason === notification.reason);
