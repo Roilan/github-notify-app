@@ -81,7 +81,6 @@ class App extends Component {
       },
     };
 
-    this.historyListener;
     this.notificationTimer;
     this.clearNotificationTimer = this.clearNotificationTimer.bind(this);
     this.setNotifications = this.setNotifications.bind(this);
@@ -92,14 +91,6 @@ class App extends Component {
   }
 
   async componentDidMount() {
-    this.historyListener = history.listen((location) => {
-      const { currentPath } = this.state;
-
-      if (currentPath !== location.pathname) {
-        this.setState({ currentPath: location.pathname });
-      }
-    });
-
     try {
       const credentials = await storage.get('credentials');
       const userSettings = await storage.get('userSettings');
@@ -123,7 +114,6 @@ class App extends Component {
   }
 
   componentWillUnmount() {
-    this.historyListener();
     this.clearNotificationTimer();
   }
 
