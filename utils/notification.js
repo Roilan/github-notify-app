@@ -1,9 +1,9 @@
 import { getDoNotDisturb } from 'macos-notification-state';
 
-export default ({ title, body }) => {
-  const doNotDisturbedEnabled = getDoNotDisturb();
+export const doNotDisturbedDisabled = () => !getDoNotDisturb();
 
-  if (!doNotDisturbedEnabled) {
+export default ({ title, body }) => {
+  if (doNotDisturbedDisabled()) {
     return new Notification(title, { body });
   }
 }
