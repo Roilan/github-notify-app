@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Redirect } from 'react-router';
 import Paper from 'material-ui/Paper';
 import {List, ListItem} from 'material-ui/List';
@@ -6,46 +6,36 @@ import Subheader from 'material-ui/Subheader';
 import Checkbox from 'material-ui/Checkbox';
 import { formatNotificationReasons } from '../utils/format';
 
-class Settings extends Component {
-  constructor() {
-    super();
+const Settings = ({ loggedIn, match, settings, onNotificationSubscriptionClick }) => {
+  const { reasons } = settings.notifications;
 
-    this.state = {
-      notifications: {
-        reasons: [
-          'assign', 'author', 'comment', 'invitation', 'manual',
-          'mention', 'state_change', 'subscribed', 'team_mention'
-        ],
-        frequency: 1 // minutes
-      }
-    };
+  if (!loggedIn && match.url === '/settings') {
+    return <Redirect to='/' />;
   }
 
-  render() {
-    const { reasons } = this.state.notifications;
-    const { loggedIn, match } = this.props;
+  const renderCheckBox = (reason) => (
+    <Checkbox
+      checked={reason.checked}
+      onCheck={onNotificationSubscriptionClick.bind(null, reason)}
+    />
+  );
 
-    if (!loggedIn && match.url === '/settings') {
-      return <Redirect to='/' />;
-    }
-
-    return (
-      <div className='screen settings-screen'>
-        <Paper style={{maxHeight: 200, overflow: 'auto', boxShadow: 'none', borderBottom: '1px solid rgb(224, 224, 224)'}}>
-        <List>
-          <Subheader>Notification Subscriptions</Subheader>
-          {reasons.map(reason => (
-            <ListItem
-              key={reason}
-              leftCheckbox={<Checkbox />}
-              primaryText={formatNotificationReasons(reason)}
-            />
-          ))}
-        </List>
-        </Paper>
-      </div>
-    );
-  }
+  return (
+    <div className='screen settings-screen'>
+      <Paper style={{maxHeight: 200, overflow: 'auto', boxShadow: 'none', borderBottom: '1px solid rgb(224, 224, 224)'}}>
+      <List>
+        <Subheader>Notification Subscriptions</Subheader>
+        {Object.keys(reasons).map(reason => (
+          <ListItem
+            key={reason}
+            leftCheckbox={renderCheckBox(reasons[reason])}
+            primaryText={formatNotificationReasons(reason)}
+          />
+        ))}
+      </List>
+      </Paper>
+    </div>
+  );
 }
 
 export default Settings;

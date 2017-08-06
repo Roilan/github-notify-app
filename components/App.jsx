@@ -7,6 +7,7 @@ import Login from './Login';
 import Settings from './Settings';
 import storage from '../utils/storage';
 import { getNotifications } from '../utils/github';
+import objectAssignDeep from 'object-assign-deep';
 
 injectTapEvent();
 
@@ -17,14 +18,57 @@ class App extends Component {
     super()
 
     this.state = {
+      currentPath: '/',
       loggedIn: false,
       notifications: [],
-      currentPath: '/'
+      settings: {
+        notifications: {
+          reasons: {
+            assign: {
+              name: 'assign',
+              checked: false
+            },
+            author: {
+              name: 'author',
+              checked: false
+            },
+            comment: {
+              name: 'comment',
+              checked: false
+            },
+            invitation: {
+              name: 'invitation',
+              checked: false
+            },
+            manual: {
+              name: 'manual',
+              checked: false
+            },
+            mention: {
+              name: 'mention',
+              checked: false
+            },
+            'state_change': {
+              name: 'state_change',
+              checked: false
+            },
+            subscribed: {
+              name: 'subscribed',
+              checked: false
+            },
+            'team_mention': {
+              name: 'team_mention',
+              checked: false
+            }
+          },
+          frequency: 1 // minutes
+        }
+      }
     };
 
     this.historyListener;
-    this.setLogin = this.setLogin.bind(this);
     this.setNotifications = this.setNotifications.bind(this);
+    this.onNotificationSubscriptionClick = this.onNotificationSubscriptionClick.bind(this);
   }
 
   async componentDidMount() {
@@ -58,12 +102,20 @@ class App extends Component {
     this.setState({ notifications, loggedIn: true });
   }
 
-  setLogin() {
-    this.setState({ loggedIn: true });
+  onNotificationSubscriptionClick({ name, checked }) {
+    this.setState(prevState => objectAssignDeep({}, prevState, {
+      settings: {
+        notifications: {
+          reasons: {
+            [name]: { checked: !checked }
+          }
+        }
+      }
+    }));
   }
 
   render() {
-    const { loggedIn } = this.state;
+    const { loggedIn, settings } = this.state;
 
     const renderView = (Component, props = {}) => routeProps => (
       <Component {...props} {...routeProps} />
@@ -75,7 +127,10 @@ class App extends Component {
       setNotifications: this.setNotifications
     });
 
-    const settingProps = Object.assign({}, commonProps);
+    const settingProps = Object.assign({}, commonProps, {
+      settings,
+      onNotificationSubscriptionClick: this.onNotificationSubscriptionClick
+    });
 
     return (
       <ThemeProvider>
