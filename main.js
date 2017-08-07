@@ -1,7 +1,11 @@
 const menubar = require('menubar');
 
 const menubarOpts = {
-  height: 600
+  height: 600,
+  showWindow: true,
+  resizable: false,
+  movable: false,
+  show: true
 };
 
 if (process.env.NODE_ENV !== 'production') {
