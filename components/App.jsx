@@ -187,7 +187,8 @@ class App extends Component {
           }
 
           const formattedNewNotifications = formatNotificationData({ notifications: data, userSettings });
-          const newNotifications = arrayDiff(notifications, formattedNewNotifications, 'id').add;
+          const notificationsDiff = arrayDiff(notifications, formattedNewNotifications, 'id');
+          const newNotifications = notificationsDiff.added;
           // TODO: should be `added`, only `common` for testing
 
           if (newNotifications) {
