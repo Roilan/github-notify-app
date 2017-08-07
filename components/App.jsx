@@ -14,6 +14,7 @@ import { getNotifications } from '../utils/github';
 import { formatNotificationData } from '../utils/format';
 import userReasons from '../utils/user-reasons';
 import sendNotification, { doNotDisturbedDisabled } from '../utils/notification';
+import openUrl from '../utils/open-url';
 
 injectTapEvent();
 
@@ -152,10 +153,20 @@ class App extends Component {
         const firstNotification = notificationsBatch[0];
 
         if (doNotDisturbedDisabled() && firstNotification) {
-          sendNotification({
+          const notification = sendNotification({
             title: `${firstNotification.repository.full_name} (${firstNotification.reason})`,
             body: firstNotification.subject.title
           });
+
+          notification.onclick = () => {
+            let url = firstNotification.subject.url.replace(/api\.|repos\//g, '');
+
+            if (url.includes('/pulls')) {
+              url = url.replace('pulls', 'pull');
+            }
+
+            openUrl(url);
+          };
 
           this.setState(prevState => ({
             notificationsBatch: prevState.notificationsBatch.filter(notification => notification.id !== firstNotification.id)
